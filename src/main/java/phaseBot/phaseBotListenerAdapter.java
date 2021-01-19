@@ -11,16 +11,25 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Map;
 
 public class phaseBotListenerAdapter extends ListenerAdapter {
+
+    /**
+     * What the bot looks for in a message to test if it needs to do anything
+     */
+    String botTrigger = "!pb";
+
+    public phaseBotListenerAdapter(String botTrigger) {
+        this.botTrigger = botTrigger;
+    }
 
     public static String OPT_STRING = "Phase Bot comes with the following commands:" +
                                       "```" +
                                       "!pb help: literally whispers this menu \n"  +
                                       "!pb cat: sends a random cat fact to the channel \n" +
                                       "!pb dog: sends a random dog fact to the channel \n" +
+                                      "!pb joke: sends a random (probably bad) joke to the channel \n" +
                                       "!pb meme: sends a random meme to the channel \n" +
                                       "```";
 
@@ -34,9 +43,8 @@ public class phaseBotListenerAdapter extends ListenerAdapter {
 
         String message = event.getMessage().getContentRaw().trim();
 
-        // using toLoserCase, because I want !phasebot to also do this stuff
-        if (!event.getAuthor().isBot() && (message.toLowerCase().startsWith("!phasebot") || message.toLowerCase().startsWith("!pb"))) {
-
+        // using toLoserCase, to save headaches
+        if (!event.getAuthor().isBot() && (message.toLowerCase().startsWith(botTrigger))) {
             String [] msgTokens = message.split(" ");
             // using toLowercase because i don't want confusion of "catfact" vs "catFact"
             String cmd = (msgTokens.length>1) ? msgTokens[1].toLowerCase() : "help";
@@ -53,6 +61,9 @@ public class phaseBotListenerAdapter extends ListenerAdapter {
                 case("dog"):
                 case("dogfact"):
                     sendDogFact(event);
+                    break;
+                case("joke"):
+                    sendJoke(event);
                     break;
                 case("meme"):
                     sendMeme(event);
@@ -77,14 +88,13 @@ public class phaseBotListenerAdapter extends ListenerAdapter {
         event.getChannel().sendMessage((String)responseMap.get("fact")).complete();
     }
 
-    private void sendDogFact(GuildMessageReceivedEvent event){
-        Map<?,?> responseMap = getJsonRestResponse(event, "https://dog-api.kinduff.com/api/facts");
+    private void sendDogFact(GuildMessageReceivedEvent event) {
+        Map<?, ?> responseMap = getJsonRestResponse(event, "https://dog-api.kinduff.com/api/facts");
         event.getChannel().sendMessage(((ArrayList<String>) responseMap.get("facts")).get(0)).complete();
     }
 
     private void sendMeme(GuildMessageReceivedEvent event) {
         // I might have to Axe this if too many images are 404...
-
         int tries = 0;
         boolean found = false;
         String url;
@@ -101,6 +111,12 @@ public class phaseBotListenerAdapter extends ListenerAdapter {
         {
             event.getChannel().sendMessage("Your call could not be completed as dialed, please try again").complete();
         }
+    }
+
+    private void sendJoke(GuildMessageReceivedEvent event){
+        Map<?,?> responseMap = getJsonRestResponse(event, "https://official-joke-api.appspot.com/random_joke");
+        String Joke =(String)responseMap.get("setup") + "\n" + (String)responseMap.get("punchline") ;
+        event.getChannel().sendMessage(Joke).complete();
     }
 
     /**

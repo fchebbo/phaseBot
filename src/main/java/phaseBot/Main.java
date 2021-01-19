@@ -19,9 +19,27 @@ public class Main {
      */
     public static void main (String [] args) throws LoginException, InterruptedException, IOException {
         Properties p = loadProps();
-        JDA jda = JDABuilder.createDefault(p.getProperty("secretToken"))
+
+        String token;
+        String mainCmd = "!pb";
+        // Adding staging support for the bot (lets me test changes on a separate bot)
+        if (args.length ==0 || !args[0].toLowerCase().equals("prod"))
+        {
+            // To enable staging support, add a "secretTokenStaging" line to the properties file
+            token = p.getProperty("secretTokenStaging");
+            if (token == null)
+            {
+                token = p.getProperty("secretToken");
+            }
+            mainCmd = "!pbs";
+        } else {
+            token = p.getProperty("secretToken");
+        }
+
+        JDA jda = JDABuilder.createDefault(token)
                 .addEventListeners(new phaseBotEventListener())
-                .addEventListeners(new phaseBotListenerAdapter()).build();
+                .addEventListeners(new phaseBotListenerAdapter(mainCmd)).build();
+
         jda.getPresence().setActivity(Activity.playing("God, type !pb for a list of options"));
     }
 

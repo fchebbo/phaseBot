@@ -1,6 +1,7 @@
 package phaseBot;
 
 import net.dv8tion.jda.api.events.GenericEvent;
+import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -21,6 +22,10 @@ public class phaseBotEventListener implements EventListener {
         if (event instanceof GuildJoinEvent)
         {
             ((GuildJoinEvent) event).getGuild().getDefaultChannel().sendMessage("YOU EXPECTED A BOT, BUT IT WAS ME DIO! Type \"!pb\" for a list of options").complete();
+        }
+        if (event instanceof ReadyEvent)
+        {
+            System.out.println("Bot is currently live in " + event.getJDA().getGuilds().size() + " servers!");
         }
     }
 }

@@ -6,17 +6,15 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
+import phaseBot.messageHandlers.*;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class phaseBotListenerAdapter extends ListenerAdapter {
 
@@ -27,16 +25,26 @@ public class phaseBotListenerAdapter extends ListenerAdapter {
 
     HashMap<String, BiConsumer<GuildMessageReceivedEvent,String>>funcMap = new HashMap<>();
 
+    HashMap <String, GuildMessageHandler> handlerMap= new HashMap<>();
+
     public phaseBotListenerAdapter(String botTrigger) {
         this.botTrigger = botTrigger;
-        funcMap.put("cat",(GuildMessageReceivedEvent ev, String s) -> {sendCatFact(ev);});
-        funcMap.put("catfact",(GuildMessageReceivedEvent ev, String s) -> {sendCatFact(ev);});
-        funcMap.put("dog",(GuildMessageReceivedEvent ev, String s) -> {sendDogFact(ev);});
-        funcMap.put("dogfact",(GuildMessageReceivedEvent ev, String s) -> {sendCatFact(ev);});
-        funcMap.put("fact",(GuildMessageReceivedEvent ev, String s) -> {sendFunFact(ev);});
-        funcMap.put("help",(GuildMessageReceivedEvent ev, String s) -> {sendHelp(ev);});
-        funcMap.put("joke",(GuildMessageReceivedEvent ev, String s) -> {sendJoke(ev);});
-        funcMap.put("meme",(GuildMessageReceivedEvent ev, String s) -> {sendMeme(ev);});
+        GuildMessageHandler catHandler = new CatHandler();
+        GuildMessageHandler dogHandler = new DogHandler();
+        GuildMessageHandler factHandler = new FactHandler();
+        GuildMessageHandler helpHandler = new HelpHandler();
+        GuildMessageHandler jokeHandler = new JokeHandler();
+        GuildMessageHandler memeHandler = new MemeHandler();
+        GuildMessageHandler norrisHandler = new NorrisHandler();
+        handlerMap.put("cat",catHandler);
+        handlerMap.put("catfact",catHandler);
+        handlerMap.put("dog",dogHandler);
+        handlerMap.put("dogFact",dogHandler);
+        handlerMap.put("fact",factHandler);
+        handlerMap.put("help",helpHandler);
+        handlerMap.put("joke",jokeHandler);
+        handlerMap.put("meme",memeHandler);
+        handlerMap.put("norris",norrisHandler);
     }
 
     public static String OPT_STRING = "Phase Bot comes with the following commands:" +
@@ -81,10 +89,10 @@ public class phaseBotListenerAdapter extends ListenerAdapter {
                 System.out.println(msgTokens[2]);
             }
 
-            BiConsumer b = funcMap.get(cmd);
-            if (b != null)
+            GuildMessageHandler handler = handlerMap.get(cmd);
+            if (handler != null)
             {
-                b.accept(event, args);
+                handler.handleMessage(event, args);
             }
         }
     }

@@ -6,6 +6,26 @@ import phaseBot.utils.PhaseBotUtils;
 import java.util.Map;
 
 public class MemeHandler implements GuildMessageHandler{
+    /**
+     * Defines the description of the handler to be used in the help function
+     *
+     * @return the description
+     */
+    @Override
+    public String getDesc() {
+        return ": Sends a random meme to the channel";
+    }
+
+    /**
+     * Defines the trigger to invoke this handler, e.g. "joke"
+     *
+     * @return
+     */
+    @Override
+    public String getTrigger() {
+        return "meme";
+    }
+
     @Override
     public void handleMessage(GuildMessageReceivedEvent event, String s) {
         // I might have to Axe this if too many images are 404...

@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
+import phaseBot.messageHandlers.GuildMessageHandler;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 public class PhaseBotUtils {
     private static RestTemplate restTemplate = new RestTemplate();
@@ -53,5 +53,30 @@ public class PhaseBotUtils {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> k = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
         return k.getStatusCode()==HttpStatus.OK;
+    }
+
+    public static void sendDmToAuthor(GuildMessageReceivedEvent event, String msg)
+    {
+        // this weird thing is what enables us to whisper a user...//TODO (PERHAPS) make this a helper method
+        event.getAuthor().openPrivateChannel().queue((channel) ->
+        {
+            channel.sendMessage(msg).queue();
+        });
+    }
+
+    /**
+     * Generates a helpString based on the Descriptions of all the handlers in the map
+     */
+    public static String generateHelpStr(String botTrigger, HashMap<String, GuildMessageHandler> handlerMap) {
+        String helpStr = "```\n";
+        ArrayList<GuildMessageHandler> newList = new ArrayList<>(handlerMap.values());
+        //bro we sorting like a champ
+        Collections.sort(newList, Comparator.comparing(GuildMessageHandler::getTrigger));
+        for (Iterator<GuildMessageHandler> it = newList.iterator(); it.hasNext(); ) {
+            GuildMessageHandler handler = it.next();
+            helpStr += botTrigger+ " " + handler.getTrigger() + handler.getDesc() +"\n";
+        }
+        helpStr += "```";
+        return helpStr;
     }
 }

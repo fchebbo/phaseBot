@@ -7,6 +7,26 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class JokeHandler implements GuildMessageHandler{
+    /**
+     * Defines the description of the handler to be used in the help function
+     *
+     * @return the description
+     */
+    @Override
+    public String getDesc() {
+        return ": Sends a random (probably bad) joke to the channel";
+    }
+
+    /**
+     * Defines the trigger to invoke this handler, e.g. "joke"
+     *
+     * @return
+     */
+    @Override
+    public String getTrigger() {
+        return "joke";
+    }
+
     @Override
     public void handleMessage(GuildMessageReceivedEvent event, String s) {
         int choice = ThreadLocalRandom.current().nextInt(1, 3);

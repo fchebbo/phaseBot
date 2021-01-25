@@ -15,4 +15,24 @@ public class NorrisHandler implements GuildMessageHandler{
 
         event.getChannel().sendMessage((String)((Map) responseMap.get("value")).get("joke")).queue();
     }
+
+    /**
+     * Defines the description of the handler to be used in the help function
+     *
+     * @return the description
+     */
+    @Override
+    public String getDesc() {
+        return ": Sends a random 'Chuck Norris' joke to the channel (YES HE'S BACK!!)";
+    }
+
+    /**
+     * Defines the trigger to invoke this handler, e.g. "joke"
+     *
+     * @return
+     */
+    @Override
+    public String getTrigger() {
+        return "norris";
+    }
 }
